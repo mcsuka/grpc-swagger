@@ -3,7 +3,6 @@ package io.grpc.grpcswagger.openapi.v2;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 
 /**
@@ -16,6 +15,9 @@ enum FieldTypeEnum {
     FLOAT("number", "float"),
     DOUBLE("number", "double"),
     STRING("string"),
+    PASSWORD("string", "password"),
+    DATE_TIME("string", "date-time"),
+    DATE("string", "date"),
     BOOLEAN("boolean"),
     OBJECT("object"),
     ARRAY("array"),

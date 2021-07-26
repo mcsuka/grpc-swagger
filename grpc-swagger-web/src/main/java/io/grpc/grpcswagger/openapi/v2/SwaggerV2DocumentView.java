@@ -1,9 +1,9 @@
 package io.grpc.grpcswagger.openapi.v2;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,12 +53,16 @@ public class SwaggerV2DocumentView {
         return documentation.getDefinitions();
     }
     
-    public Map<String, PathItem> getPaths() {
+    public SortedMap<String, PathItem> getPaths() {
         if (StringUtils.isBlank(serviceName)) {
             return documentation.getPaths();
         }
-        return documentation.getPaths().entrySet().stream()
+        return documentation.getPaths()
+                .entrySet()
+                .stream()
                 .filter(e -> e.getKey().contains(serviceName + "."))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(TreeMap::new,
+                        (map, item) -> map.put(item.getKey(), item.getValue()),
+                        TreeMap::putAll);
     }
 }

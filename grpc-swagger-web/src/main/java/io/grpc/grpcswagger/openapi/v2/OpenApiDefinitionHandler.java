@@ -5,8 +5,8 @@ import static io.grpc.grpcswagger.openapi.v2.OpenApiParser.HTTP_OK;
 import static java.util.Optional.ofNullable;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -66,9 +66,14 @@ public class OpenApiDefinitionHandler {
     private DefinitionType buildDefinitionType(Descriptor descriptor) {
         DefinitionType definitionType = new DefinitionType();
         definitionType.setTitle(descriptor.getName());
-        definitionType.setType(FieldTypeEnum.OBJECT.getType());
         definitionType.setProperties(new LinkedHashMap<>());
-        typeDescriptorLookupTable.put(descriptor.getFullName(), descriptor);
+        if ("google.protobuf.Timestamp".equals(descriptor.getFullName())) {
+            definitionType.setType(FieldTypeEnum.DATE_TIME.getType());
+            definitionType.setFormat(FieldTypeEnum.DATE_TIME.getFormat());
+        } else {
+            definitionType.setType(FieldTypeEnum.OBJECT.getType());
+            typeDescriptorLookupTable.put(descriptor.getFullName(), descriptor);
+        }
         return definitionType;
     }
     
@@ -83,7 +88,7 @@ public class OpenApiDefinitionHandler {
         typeLookupTable.forEach((typeName, definitionType) -> {
             Descriptor protocolDescriptor = typeDescriptorLookupTable.get(typeName);
             if (protocolDescriptor == null) {
-                logger.error("ProtocolDescriptor not found for type {}", typeName);
+                logger.info("ProtocolDescriptor not found for type {}", typeName);
             } else {
                 Map<String, FieldProperty> properties = definitionType.getProperties();
                 List<Descriptors.FieldDescriptor> fields = protocolDescriptor.getFields();
@@ -100,12 +105,13 @@ public class OpenApiDefinitionHandler {
         
         serviceResolver.listServices().forEach(serviceDescriptor -> {
             List<Descriptors.MethodDescriptor> methods = serviceDescriptor.getMethods();
-            methods.forEach(methodDescriptor -> {
-                PathItem pathItem = new PathItem();
-                Operation operation = parseOperation(methodDescriptor);
-                pathItem.setPost(operation);
-                pathItemMap.put('/' + methodDescriptor.getFullName(), pathItem);
-            });
+            methods.stream()
+                .forEach(methodDescriptor -> {
+                    PathItem pathItem = new PathItem();
+                    Operation operation = parseOperation(methodDescriptor);
+                    pathItem.setPost(operation);
+                    pathItemMap.put('/' + methodDescriptor.getFullName(), pathItem);
+                });
         });
         
         return pathItemMap;

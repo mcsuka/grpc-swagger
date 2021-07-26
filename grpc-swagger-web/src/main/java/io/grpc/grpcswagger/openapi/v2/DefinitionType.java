@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class DefinitionType {
     private String type;
+    private String format;
     private String title;
     private LinkedHashMap<String, FieldProperty> properties;
 }

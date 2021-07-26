@@ -48,7 +48,11 @@ public class GrpcProxyService {
         try {
             grpcClientService.call(callParams).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Caught exception while waiting for rpc", e);
+            if (e.getCause() instanceof io.grpc.StatusRuntimeException) {
+                throw new IllegalArgumentException("gRPC request failed: " + e.getCause().getMessage(), e.getCause());
+            } else {
+                throw new RuntimeException("Proxy error: " + e , e);
+            }
         }
         return results;
     }

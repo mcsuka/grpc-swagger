@@ -99,6 +99,8 @@ public class GrpcController {
             channel = ChannelFactory.create(endPoint, metaHeaderMap);
             CallResults results = grpcProxyService.invokeMethod(methodDefinition, channel, DEFAULT, singletonList(payload));
             return Result.success(results.asJSON()).setEndpoint(endPoint.toString());
+        } catch (IllegalArgumentException iae) {
+            throw new BadRequestException(iae.getMessage(), iae.getCause());
         } finally {
             if (channel != null) {
                 channel.shutdown();
