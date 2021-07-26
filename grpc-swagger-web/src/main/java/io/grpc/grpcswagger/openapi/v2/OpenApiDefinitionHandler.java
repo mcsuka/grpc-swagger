@@ -5,9 +5,12 @@ import static io.grpc.grpcswagger.openapi.v2.OpenApiParser.HTTP_OK;
 import static java.util.Optional.ofNullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
@@ -64,7 +67,7 @@ public class OpenApiDefinitionHandler {
         DefinitionType definitionType = new DefinitionType();
         definitionType.setTitle(descriptor.getName());
         definitionType.setType(FieldTypeEnum.OBJECT.getType());
-        definitionType.setProperties(new HashMap<>());
+        definitionType.setProperties(new LinkedHashMap<>());
         typeDescriptorLookupTable.put(descriptor.getFullName(), descriptor);
         return definitionType;
     }
@@ -92,8 +95,8 @@ public class OpenApiDefinitionHandler {
         });
     }
     
-    public Map<String, PathItem> parsePaths(ServiceResolver serviceResolver) {
-        Map<String, PathItem> pathItemMap = new HashMap<>();
+    public SortedMap<String, PathItem> parsePaths(ServiceResolver serviceResolver) {
+        SortedMap<String, PathItem> pathItemMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         
         serviceResolver.listServices().forEach(serviceDescriptor -> {
             List<Descriptors.MethodDescriptor> methods = serviceDescriptor.getMethods();
@@ -117,7 +120,7 @@ public class OpenApiDefinitionHandler {
         operation.setDescription(methodDescriptor.getName());
         List<Parameter> parameters = parseParameters(inputType);
         parameters.add(buildHeaderParameter());
-        Map<String, ResponseObject> response = parseResponse(outputType);
+        SortedMap<String, ResponseObject> response = parseResponse(outputType);
         operation.setParameters(parameters);
         operation.setResponses(response);
         return operation;
@@ -143,19 +146,19 @@ public class OpenApiDefinitionHandler {
         return parameter;
     }
     
-    private Map<String, ResponseObject> parseResponse(Descriptor outputType) {
+    private SortedMap<String, ResponseObject> parseResponse(Descriptor outputType) {
         ResponseObject responseObject = new ResponseObject();
         ParameterSchema responseSchema = new ParameterSchema();
         responseSchema.setRef(findRefByType(outputType));
         responseObject.setSchema(responseSchema);
-        Map<String, ResponseObject> response = new HashMap<>();
+        SortedMap<String, ResponseObject> response = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         response.put(HTTP_OK, responseObject);
         return response;
     }
     
     private FieldProperty parseFieldProperty(Descriptors.FieldDescriptor fieldDescriptor) {
         Descriptors.FieldDescriptor.Type type = fieldDescriptor.getType();
-        
+
         FieldTypeEnum fieldTypeEnum = FieldTypeEnum.getByFieldType(type);
         
         FieldProperty fieldProperty = new FieldProperty();

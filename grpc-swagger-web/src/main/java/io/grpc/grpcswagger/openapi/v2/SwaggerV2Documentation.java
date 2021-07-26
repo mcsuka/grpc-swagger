@@ -2,7 +2,7 @@ package io.grpc.grpcswagger.openapi.v2;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 import lombok.Data;
 
@@ -18,6 +18,6 @@ public class SwaggerV2Documentation {
     private String basePath = "/";
     private String host = "localhost:8088";
     private List<String> schemes = Collections.singletonList("http");
-    private Map<String, DefinitionType> definitions;
-    private Map<String, PathItem> paths;
+    private SortedMap<String, DefinitionType> definitions;
+    private SortedMap<String, PathItem> paths;
 }

@@ -1,6 +1,6 @@
 package io.grpc.grpcswagger.openapi.v2;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 import lombok.Data;
 
@@ -11,5 +11,5 @@ import lombok.Data;
 public class DefinitionType {
     private String type;
     private String title;
-    private Map<String, FieldProperty> properties;
+    private LinkedHashMap<String, FieldProperty> properties;
 }

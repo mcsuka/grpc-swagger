@@ -1,8 +1,8 @@
 package io.grpc.grpcswagger.openapi.v2;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.google.protobuf.Descriptors;
 
@@ -23,12 +23,12 @@ public class OpenApiParser {
      */
     public static SwaggerV2Documentation parseDefinition(ServiceResolver serviceResolver) {
         List<Descriptors.FileDescriptor> fileDescriptors = serviceResolver.getFileDescriptors();
-    
-        Map<String, DefinitionType> typeLookupTable = new HashMap<>();
+
+        SortedMap<String, DefinitionType> typeLookupTable = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         OpenApiDefinitionHandler definitionHandler = new OpenApiDefinitionHandler(typeLookupTable);
         definitionHandler.parseModelTypes(fileDescriptors);
         definitionHandler.processMessageFields();
-        Map<String, PathItem> pathItemMap = definitionHandler.parsePaths(serviceResolver);
+        SortedMap<String, PathItem> pathItemMap = definitionHandler.parsePaths(serviceResolver);
         SwaggerV2Documentation swaggerV2Documentation = new SwaggerV2Documentation();
         swaggerV2Documentation.setInfo(new InfoObject.InfoObjectBuilder()
                 .title("grpc-swagger").build());
